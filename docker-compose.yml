@@ -4,6 +4,8 @@ services:
     container_name: musicdl-agent
     ports:
       - "8700:8700"
+    environment:
+      - MUSICDL_API_KEY=change-me   # 设置后所有请求需带 key;留空/删除则不验证
     volumes:
       - /path/to/your/music:/music   # 改成你的音乐库目录
     restart: unless-stopped

@@ -81,6 +81,15 @@ docker run -d --name musicdl-agent \
 
 Base URL: `http://<your-host>:8700`
 
+**认证(可选)**:设置环境变量 `MUSICDL_API_KEY` 后,除 `/health` 外所有接口需携带 key,否则 401:
+
+```bash
+curl -H "X-API-Key: <your-key>" http://<host>:8700/songs
+# 或 Authorization: Bearer <your-key>
+```
+
+未设置 `MUSICDL_API_KEY` 时不做验证(默认开放,建议仅在内网使用)。
+
 | 接口 | 说明 |
 |---|---|
 | `GET /health` | 健康检查 |

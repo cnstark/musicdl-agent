@@ -9,7 +9,8 @@ description: Use when downloading music via the musicdl-agent service.
 
 ## 基本信息
 
-- 地址:`http://<your-host>:8700`(部署时替换;下同)
+- 地址：`http://<your-host>:8700`(部署时替换;下同)
+- **认证**:服务端设置 `MUSICDL_API_KEY` 后,所有请求(除 /health)必须带请求头 `X-API-Key: <key>` 或 `Authorization: Bearer <key>`,否则 401
 - 音乐库:服务端配置的 `/music` 挂载目录
 - 免费源:kugou / kuwo / netease,无需登录,默认无损 FLAC
 - **服务启动慢(musicdl 加载),重启后首次请求可能 502,等 10-15s 重试**

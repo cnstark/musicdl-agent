@@ -4,18 +4,24 @@ musicdl-agent — 无损音乐搜索下载服务
   搜索选版(酷狗→酷我→网易,精确歌名→排除变体→专辑匹配→合唱歌手全匹配→取最小)
   → 下载 → 校验文件头 → 存入音乐库目录
 """
-import logging, re, time, unicodedata, uuid, json
+import logging, re, time, unicodedata, uuid, json, os
 from pathlib import Path
 from threading import Lock
 
 logging.disable(logging.CRITICAL)
 import requests
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 from musicdl import musicdl
 
+# API key 验证: 环境变量 MUSICDL_API_KEY 设置后, 除 /health 外所有请求需携带 key
+# 请求头: X-API-Key: <key>  或  Authorization: Bearer <key>
+API_KEY = os.environ.get('MUSICDL_API_KEY', '')
+
 MUSIC_DIR = Path('/music')          # 容器内音乐库挂载点
 RECORDS_FILE = MUSIC_DIR / '.musicdl-agent_records.json'  # 下载信息持久化(随音乐库目录)
+LEGACY_RECORDS_FILE = MUSIC_DIR / '.musicdown_records.json'  # 旧版记录文件名,兼容读取
 FALLBACK = ['KugouMusicClient', 'KuwoMusicClient', 'NeteaseMusicClient']
 LOSSLESS = {'flac', 'ape', 'wav'}
 MAGIC = {'flac': b'fLaC', 'ape': b'MAC ', 'wav': b'RIFF'}
@@ -25,6 +31,18 @@ SRC_SHORT = {'KugouMusicClient': 'kugou', 'KuwoMusicClient': 'kuwo', 'NeteaseMus
 app = FastAPI(title='musicdl-agent')
 tasks = {}
 tasks_lock = Lock()
+
+
+@app.middleware('http')
+async def api_key_auth(request, call_next):
+    if API_KEY and request.url.path not in ('/health', '/docs', '/openapi.json'):
+        key = request.headers.get('x-api-key', '')
+        if not key:
+            auth = request.headers.get('authorization', '')
+            key = auth[7:] if auth.lower().startswith('bearer ') else ''
+        if key != API_KEY:
+            return JSONResponse({'ok': False, 'error': 'unauthorized: invalid or missing api key'}, status_code=401)
+    return await call_next(request)
 
 
 def norm(s):
@@ -93,6 +111,10 @@ records_lock = Lock()
 def load_records():
     try:
         return json.loads(RECORDS_FILE.read_text(encoding='utf-8'))
+    except Exception:
+        pass
+    try:  # 兼容旧文件名
+        return json.loads(LEGACY_RECORDS_FILE.read_text(encoding='utf-8'))
     except Exception:
         return {}
 

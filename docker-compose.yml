@@ -1,8 +1,8 @@
 services:
-  musicdown-api:
+  musicdl-agent:
     build: ./service
-    image: musicdown-api:latest
-    container_name: musicdown-api
+    image: musicdl-agent:latest
+    container_name: musicdl-agent
     ports:
       - "8700:8700"
     volumes:

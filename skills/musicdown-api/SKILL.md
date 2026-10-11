@@ -1,9 +1,9 @@
 ---
-name: musicdown-api
-description: Use when downloading music via the musicdown-api service.
+name: musicdl-agent
+description: Use when downloading music via the musicdl-agent service.
 ---
 
-# musicdown-api — 无损音乐下载服务
+# musicdl-agent — 无损音乐下载服务
 
 跑在服务器/NAS 上的 FastAPI 服务,封装 musicdl 搜索/下载/校验/入库全流程。下载直接写入服务端音乐目录。
 
@@ -52,5 +52,5 @@ curl -X POST http://<your-host>:8700/download_select -H "Content-Type: applicati
 - **id 是稳定引用,下载 URL 带签名数小时过期**:download_select 总是重新搜索解析,绝不让调用方传 URL
 - id 未命中返回 `id 未命中` 错误 → 重新 `/search` 再选
 - 文件名规范:`歌手-歌名.flac`(`/` 转 `_`,NFC 归一化),保存在音乐库根目录
-- 下载信息自动记录到音乐库 `.musicdown_records.json`(含 source_id),`/songs` 可查
+- 下载信息自动记录到音乐库 `.musicdl-agent_records.json`(含 source_id),`/songs` 可查
 - 默认原版专辑(录音室)版本;Live/演唱会版只在明确要求时通过 download_select 下

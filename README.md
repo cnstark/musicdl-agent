@@ -1,4 +1,4 @@
-# musicdown — 个人无损音乐下载服务
+# musicdl-agent — 个人无损音乐下载服务
 
 把「搜索 → 智能选版 → 下载 → 校验 → 入库」整套流程封装成跑在 NAS 上的 HTTP API 服务,AI agent(Hermes / OpenClaw 等)可直接调用。
 
@@ -10,13 +10,13 @@
 
 ```
 ┌─────────────┐   HTTP    ┌──────────────────────────────┐
-│  AI Agent   │ ────────► │  musicdown-api (NAS Docker)  │
+│  AI Agent   │ ────────► │  musicdl-agent (NAS Docker)  │
 │ (带 skill)  │           │                              │
 └─────────────┘           │  搜索选版 → 下载 → 校验 → 入库 │
                           └──────────────┬───────────────┘
                                          ▼
                                   NAS 音乐目录 (FLAC)
-                                  + .musicdown_records.json
+                                  + .musicdl-agent_records.json
                                   (每首的来源/ID/时长记录)
 ```
 
@@ -37,7 +37,7 @@
 ```yaml
 # docker-compose.yml
 services:
-  musicdown-api:
+  musicdl-agent:
     build: ./service
     ports:
       - "8700:8700"
@@ -54,12 +54,12 @@ docker compose up -d --build
 
 ```bash
 cd service
-docker build -t musicdown-api .
-docker run -d --name musicdown-api \
+docker build -t musicdl-agent .
+docker run -d --name musicdl-agent \
   -p 8700:8700 \
   -v /path/to/your/music:/music \
   --restart unless-stopped \
-  musicdown-api
+  musicdl-agent
 ```
 
 首次启动需要 10-15 秒加载(musicdl 初始化),期间请求可能 502,稍后重试即可。
@@ -105,7 +105,7 @@ curl -X POST http://<host>:8700/download_select \
 
 `skills/` 目录提供开箱即用的 agent 技能,兼容 Hermes / OpenClaw 等支持 SKILL.md 的框架:
 
-- **`musicdown-api/`** — 教 agent 调用本服务(接口、两条工作流、注意事项)。复制到 agent 的 skills 目录即可。使用前把文档里的 `<your-host>` 换成你的 NAS 地址。
+- **`musicdl-agent/`** — 教 agent 调用本服务(接口、两条工作流、注意事项)。复制到 agent 的 skills 目录即可。使用前把文档里的 `<your-host>` 换成你的 NAS 地址。
 - **`musicdl/`** — musicdl 使用经验沉淀(可用源、匹配规则、坑),附批量下载脚本 `scripts/fetch_lossless.py`(逐首流水线:选版→下载→校验→回写 CSV→清理)。
 
 ### fetch_lossless.py

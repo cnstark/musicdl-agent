@@ -1,5 +1,5 @@
 """
-musicdown-api — 无损音乐搜索下载服务
+musicdl-agent — 无损音乐搜索下载服务
 把我们验证过的流程封装成 HTTP API:
   搜索选版(酷狗→酷我→网易,精确歌名→排除变体→专辑匹配→合唱歌手全匹配→取最小)
   → 下载 → 校验文件头 → 存入音乐库目录
@@ -15,14 +15,14 @@ from pydantic import BaseModel
 from musicdl import musicdl
 
 MUSIC_DIR = Path('/music')          # 容器内音乐库挂载点
-RECORDS_FILE = MUSIC_DIR / '.musicdown_records.json'  # 下载信息持久化(随音乐库目录)
+RECORDS_FILE = MUSIC_DIR / '.musicdl-agent_records.json'  # 下载信息持久化(随音乐库目录)
 FALLBACK = ['KugouMusicClient', 'KuwoMusicClient', 'NeteaseMusicClient']
 LOSSLESS = {'flac', 'ape', 'wav'}
 MAGIC = {'flac': b'fLaC', 'ape': b'MAC ', 'wav': b'RIFF'}
 VARIANT_MARKS = ('live', 'dj', '伴奏', '剪辑', 'cover', 'remix', '版', '现场')
 SRC_SHORT = {'KugouMusicClient': 'kugou', 'KuwoMusicClient': 'kuwo', 'NeteaseMusicClient': 'netease'}
 
-app = FastAPI(title='musicdown-api')
+app = FastAPI(title='musicdl-agent')
 tasks = {}
 tasks_lock = Lock()
 

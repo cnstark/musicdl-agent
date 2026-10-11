@@ -1,7 +1,6 @@
 services:
   musicdl-agent:
-    build: ./service
-    image: musicdl-agent:latest
+    image: ghcr.io/cnstark/musicdl-agent:latest
     container_name: musicdl-agent
     ports:
       - "8700:8700"

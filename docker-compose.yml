@@ -1,0 +1,10 @@
+services:
+  musicdown-api:
+    build: ./service
+    image: musicdown-api:latest
+    container_name: musicdown-api
+    ports:
+      - "8700:8700"
+    volumes:
+      - /path/to/your/music:/music   # 改成你的音乐库目录
+    restart: unless-stopped

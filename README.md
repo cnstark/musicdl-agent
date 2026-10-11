@@ -32,13 +32,26 @@
 
 ## 快速开始
 
-### 方式一:Docker Compose(推荐)
+### 方式零:直接用预构建镜像(推荐)
+
+每次发 tag 自动构建多架构镜像(amd64/arm64)并推送到 GHCR:
+
+```bash
+docker pull ghcr.io/cnstark/musicdl-agent:latest
+docker run -d --name musicdl-agent \
+  -p 8700:8700 \
+  -v /path/to/your/music:/music \
+  --restart unless-stopped \
+  ghcr.io/cnstark/musicdl-agent:latest
+```
+
+### 方式一:Docker Compose
 
 ```yaml
 # docker-compose.yml
 services:
   musicdl-agent:
-    build: ./service
+    image: ghcr.io/cnstark/musicdl-agent:latest   # 或 build: ./service 自行构建
     ports:
       - "8700:8700"
     volumes:
